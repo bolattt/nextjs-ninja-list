@@ -92,20 +92,27 @@ export default function Home() {
 
 ### Naming the Selectors 
 
-We have to select using class name. Cannot select the tag. 
+We have to use the class name. Cannot use tag selector. 
 
-eg.   className = 'title' , className = 'text'
+.title { 
+ color: #333;
+}
+
+.text { 
+
+
+}
 
 then apply 
 
-`<div className={styles.title}>`
+`<h1 className={styles.title}>`
 
 ---
 
 
 ## Using CSS Modules avoid the clash 
 
-Even if we use same class names in different components, they are not gonna clash with each other. Becuase some random characters are added to the end of class names by Next when we use css modules. 
+Even if we use same class names in different components, they are not gonna clash with each other. Becuase some random characters are added to the end of class names by Next when we use css modules. They are scoped to individual components. 
 
 ---
 
@@ -154,6 +161,148 @@ export default function Home() {
 ```
 
 --- 
+
+## Fething Data in Next : getStaticProps()
+
+Provided by Next. 
+
+```
+export const getStaticProps = async () => {
+  const res = await fetch("https://jsonplaceholder.typicode.com/users");
+  const data = await res.json();
+  return {
+    props: { ninjas:data },
+  };
+};
+
+
+```
+It runs at build time. It never runs in browser. 
+
+---
+
+## File Naming in Next 
+
+``` 
+[id].js
+```
+
+[ ] means it's a dynamic value 
+
+--- 
+
+ ninjas folder > [id].js 
+
+to visit that route 
+
+`http://localhost:3000/ninjas/:id`
+
+
+--- 
+
+## getStaticPaths 
+
+The job of next is to build static pages
+
+and js bundles based on our components.
+
+And the reason for doing this `getStaticPaths`
+
+property or rather function right here,
+
+is to first tell next
+
+how many html pages need to be made
+
+based on our data.
+
+So Next will run this function and
+
+will see the  paths property that we return
+
+and then it will know how many html
+
+pages to create based on this.
+
+Then for each of those, it will run
+
+`getStaticProps` function and fetch
+
+each item that we need and then we put
+
+that into the `Deatils`
+
+component so it can generate a template
+
+for each of these pages
+
+and then eventually it will generate an
+
+html page for each individual item.
+
+```
+export const getStaticPaths = async () => {
+  const res = await fetch("https://jsonplaceholder.typicode.com/users");
+  const data = await res.json();
+
+  const paths = data.map((ninja) => {
+    return {
+      params: { id: ninja.id.toString() },
+    };
+  });
+
+  return { paths, fallback: false };
+};
+
+export const getStaticProps = async (context) => {
+  const id = context.params.id;
+  const res = await fetch("https://jsonplaceholder.typicode.com/users/" + id);
+  const data = await res.json();
+
+  return {
+    props: { ninja: data },
+  };
+};
+
+const Details = ({ ninja }) => {
+  return (
+    <div>
+      <h1>{ninja.name}</h1>
+      <p>{ninja.email}</p>
+      <p>{ninja.website}</p>
+      <p>{ninja.address.city}</p>
+    </div>
+  );
+};
+
+export default Details;
+<div>
+  <h1>Deatils Page</h1>
+</div>;
+
+```
+
+--- 
+
+## npm run build 
+
+Running `npm run build` will generate statics sites in 
+
+` .next > server > pages > ninjas ` 
+
+## Deployment 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
